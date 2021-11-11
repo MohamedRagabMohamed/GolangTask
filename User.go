@@ -1,8 +1,8 @@
 package main
 
 type User struct {
-	name        string `json:"name" validate:"required"`
-	password    string `json:"password" validate:"required"`
-	email       string `json:"email" validate:"required&email"`
-	phoneNumber string `json:"phoneNumber" validate:"required,gte=10"`
+	Name        string `json:"name" validate:"required"`
+	Password    string `json:"password" validate:"required"`
+	Email       string `json:"email" validate:"required&email"`
+	PhoneNumber string `json:"phoneNumber" validate:"required,gte=10"`
 }

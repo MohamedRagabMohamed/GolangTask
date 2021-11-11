@@ -1,9 +1,7 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -13,20 +11,19 @@ func main() {
 	Users = make(map[int]User, 0)
 
 	Users[1] = User{
-		name:        "Mohamed Ragab",
-		email:       "mohamed@gmail.com",
-		password:    "123456",
-		phoneNumber: "01096023385",
+		Name:        "Mohamed Ragab",
+		Email:       "mohamed@gmail.com",
+		Password:    "123456",
+		PhoneNumber: "01096023385",
 	}
 
 	Users[2] = User{
-		name:        "Ahmed Ragab",
-		email:       "ahmed@gmail.com",
-		password:    "123456",
-		phoneNumber: "01101285885",
+		Name:        "Ahmed Ragab",
+		Email:       "ahmed@gmail.com",
+		Password:    "123456",
+		PhoneNumber: "01101285885",
 	}
-	data,err :=json.Marshal(Users[1])
-	fmt.Println(string(data),err)
+	fmt.Println(Users)
 	r := gin.Default()
 	r.GET("/posts", Posts)
 	r.GET("/posts/:id", Show)
