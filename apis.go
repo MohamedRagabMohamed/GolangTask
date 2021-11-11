@@ -7,12 +7,22 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-//TODO change all name to Users
+//TODO make api response scheme same in all apis
+/*
+data:
+message:
+status: true or false
+errors:
+*/
+
+//TODO change all name to users
 func Posts(g *gin.Context) {
 	//TODO if len is retrun 200
 	if len(Users) == 0 {
+		//TODO return empty array
 		g.JSON(http.StatusOK, "Not found users")
 	} else {
+		//TODO make transformer to return array of users not map
 		g.JSON(http.StatusOK, gin.H{
 			"users": Users,
 		})
@@ -28,6 +38,7 @@ func Store(g *gin.Context) {
 			"message": err.Error(),
 		})
 	} else {
+		//TODO rename this variabel and make function to get new id
 		len := len(Users) + 1
 		Users[len] = user
 		g.JSON(http.StatusOK, gin.H{
@@ -39,6 +50,7 @@ func Store(g *gin.Context) {
 
 func Update(g *gin.Context) {
 	id,_:= strconv.Atoi(g.Param("id"))
+	//TODO check errors form bind
 	var user User
 	g.BindJSON(&user)
 	if _,found :=Users[id];found {
