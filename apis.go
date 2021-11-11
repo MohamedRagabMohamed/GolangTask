@@ -9,8 +9,9 @@ import (
 	"github.com/go-playground/validator/v10"
 )
 
-
+//TODO change all name to Users
 func Posts(g *gin.Context){
+	//TODO if len is
 	if len(Users) == 0{
 		g.JSON(404,"Not found users")
 	}else {
@@ -24,7 +25,6 @@ func Posts(g *gin.Context){
 			"Users":data,
 		})
 	}
-
 }
 
 func Store(g *gin.Context){
