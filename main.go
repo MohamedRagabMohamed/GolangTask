@@ -1,9 +1,10 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+
 	"github.com/gin-gonic/gin"
-	_ "log"
 )
 
 var Users map[int]User
@@ -24,9 +25,8 @@ func main() {
 		password:    "123456",
 		phoneNumber: "01101285885",
 	}
-
-	fmt.Println(len(Users))
-
+	data,err :=json.Marshal(Users[1])
+	fmt.Println(string(data),err)
 	r := gin.Default()
 	r.GET("/posts", Posts)
 	r.GET("/posts/:id", Show)
