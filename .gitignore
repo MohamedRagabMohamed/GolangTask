@@ -1,2 +1,5 @@
 vendor
 .idea
+.env
+GolangTask
+GolangTask.exe
