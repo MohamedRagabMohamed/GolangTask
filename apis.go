@@ -33,7 +33,7 @@ func Store(g *gin.Context) {
 		return
 	}
 	db.Create(&user)
-	g.JSON(http.StatusOK,gin.H{
+	g.JSON(http.StatusCreated,gin.H{
 		"data":user,
 		"message":"User added successfully",
 		"error":"",
@@ -41,15 +41,8 @@ func Store(g *gin.Context) {
 }
 
 func Update(g *gin.Context) {
-		var oldUser User
-		id:=g.Param("id")
-		db.Find(&oldUser,id)
-		if oldUser.Name==""{
-			g.JSON(http.StatusNotFound,gin.H{
-				"data":"{}",
-				"message":"No user found",
-				"error":"",
-			})
+		oldUser:=getUserByID(g)
+		if oldUser.ID == 0{
 			return
 		}
 		var updateUser User
@@ -77,18 +70,10 @@ func Update(g *gin.Context) {
 }
 
 func Delete(g *gin.Context) {
-	var user User
-	id:=g.Param("id")
-
-	db.Find(&user,id)
-	if user.Name==""{
-		g.JSON(http.StatusNotFound,gin.H{
-			"data":"",
-			"message":"No user found",
-			"error":"",
-		})
+	user:=getUserByID(g)
+	if user.ID == 0{
 		return
-	}
+	} 
 	db.Unscoped().Delete(&user)
 	g.JSON(http.StatusOK,gin.H{
 		"data":user,
@@ -98,9 +83,21 @@ func Delete(g *gin.Context) {
 }
 
 func Show(g *gin.Context) {
+	user:=getUserByID(g)
+	if user.ID == 0{
+		return
+	} 
+	g.JSON(http.StatusOK,gin.H{
+		"data":user,
+		"message":"User found seccessfully",
+		"error":"",
+	})
+}
+
+
+func getUserByID(g *gin.Context)User {
 	var user User
 	id:=g.Param("id")
-
 	db.Find(&user,id)
 	if user.Name==""{
 		g.JSON(http.StatusNotFound,gin.H{
@@ -108,11 +105,6 @@ func Show(g *gin.Context) {
 			"message":"No user found",
 			"error":"",
 		})
-		return
 	}
-	g.JSON(http.StatusOK,gin.H{
-		"data":user,
-		"message":"User found seccessfully",
-		"error":"",
-	})
+	return user
 }
