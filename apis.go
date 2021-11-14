@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func Users(g *gin.Context) {
@@ -32,6 +33,8 @@ func Store(g *gin.Context) {
 		})
 		return
 	}
+	password, _ := HashPassword(user.Password)
+	user.Password=string(password)
 	db.Create(&user)
 	g.JSON(http.StatusCreated,gin.H{
 		"data":user,
@@ -57,7 +60,7 @@ func Update(g *gin.Context) {
 
 		oldUser.Name=updateUser.Name
 		oldUser.Email=updateUser.Email
-		oldUser.Password=updateUser.Password
+		oldUser.Password,_= HashPassword(updateUser.Password)
 		oldUser.PhoneNumber=updateUser.PhoneNumber
 
 		db.Save(&oldUser)
@@ -107,4 +110,9 @@ func getUserByID(g *gin.Context)User {
 		})
 	}
 	return user
+}
+
+func HashPassword(password string) (string, error) {
+    bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+    return string(bytes), err
 }
