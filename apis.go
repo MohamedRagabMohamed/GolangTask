@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/gin-gonic/gin"
+	"github.com/icrowley/fake"
 )
 
 //TODO make api response scheme same in all apis
@@ -16,15 +17,25 @@ errors:
 */
 
 //TODO change all name to users
-func Posts(g *gin.Context) {
+func UserS(g *gin.Context) {
 	//TODO if len is retrun 200
 	if len(Users) == 0 {
 		//TODO return empty array
-		g.JSON(http.StatusOK, "Not found users")
+		g.JSON(http.StatusOK, gin.H{
+			"data":Users,
+			"message":"No found users",
+			"errors":"No found error",
+		})
 	} else {
 		//TODO make transformer to return array of users not map
+		/*var outputUsers []User
+		for _, value := range Users {
+			outputUsers = append(outputUsers, value)
+		}*/
 		g.JSON(http.StatusOK, gin.H{
-			"users": Users,
+			"data":Users,
+			"message":"All users",
+			"errors":"No found error",
 		})
 	}
 }
@@ -35,14 +46,18 @@ func Store(g *gin.Context) {
 	err :=g.BindJSON(&user)
 	if err != nil {
 		g.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
+			"data":"",
+			"message":"User not created",
+			"errors":"please enter valid user data",
 		})
 	} else {
 		//TODO rename this variabel and make function to get new id
-		len := len(Users) + 1
-		Users[len] = user
+		id := generateID()
+		Users[id] = user
 		g.JSON(http.StatusOK, gin.H{
-			"New User": user,
+			"data":user,
+			"message":"user added successfully",
+			"errors":"No found error",
 		})
 	}
 
@@ -52,8 +67,8 @@ func Update(g *gin.Context) {
 	id,_:= strconv.Atoi(g.Param("id"))
 	//TODO check errors form bind
 	var user User
-	g.BindJSON(&user)
-	if _,found :=Users[id];found {
+	err := g.BindJSON(&user)
+	if _,found :=Users[id];found && err == nil{
 		Users[id]=User{
 			Name: user.Name,
 			Email: user.Email,
@@ -61,11 +76,15 @@ func Update(g *gin.Context) {
 			PhoneNumber: user.PhoneNumber,
 		}
 		g.JSON(http.StatusOK,gin.H{
-			"id":Users[id],
+			"data":Users[id],
+			"message":"user updated successfully",
+			"errors":"No found error",
 		})
 	}else{
 		g.JSON(http.StatusNotFound,gin.H{
-			"message":"No found user",
+			"data":"{}",
+			"message":"No found users",
+			"errors":"No found users",
 		})
 	}	
 }
@@ -75,11 +94,15 @@ func Delete(g *gin.Context) {
 	if value,found :=Users[id];found {
 		delete(Users, id)
 		g.JSON(http.StatusOK,gin.H{
-			"Deleted user":value,
+			"data":value,
+			"message":"User deleted successfully",
+			"errors":"No found error",
 		})
 	}else{
 		g.JSON(http.StatusNotFound,gin.H{
-			"message":"No found user",
+			"data":"{}",
+			"message":"No found users",
+			"errors":"No found users",
 		})
 	}
 }
@@ -88,11 +111,32 @@ func Show(g *gin.Context) {
 	id,_:= strconv.Atoi(g.Param("id"))
 	if value,found :=Users[id];found {
 		g.JSON(http.StatusOK,gin.H{
-			"id":value,
+			"data":value,
+			"message":"User is found",
+			"errors":"No found error",
 		})
 	}else{
 		g.JSON(http.StatusNotFound,gin.H{
-			"message":"No found user",
+			"data":"{}",
+			"message":"No found users",
+			"errors":"No found users",
 		})
 	}
+}
+
+// additional function
+
+func Seeder(){
+	for i:= 1; i <= 10 ; i++ {
+		Users[i] = User{
+			Name:        fake.FullName(),	
+			Email:       fake.EmailAddress(),
+			Password:    fake.SimplePassword(),
+			PhoneNumber: fake.Phone(),
+		}
+	}
+}
+
+func generateID()int{
+	return len(Users)+1
 }
