@@ -1,8 +1,11 @@
 package main
 
+import "gorm.io/gorm"
+
 type User struct {
-	Name        string `json:"name" validate:"required"`
-	Password    string `json:"password" validate:"required"`
-	Email       string `json:"email" validate:"required&email"`
-	PhoneNumber string `json:"phoneNumber" validate:"required,gte=10"`
+	gorm.Model
+	Name        string `gorm:"type:varchar(100)" json:"name" binding:"required"`
+	Email       string `gorm:"type:varchar(100)" json:"email" binding:"required"`
+	Password    string `gorm:"type:varchar(100)" json:"password" `
+	PhoneNumber string `gorm:"type:varchar(100)" json:"phone_number`
 }

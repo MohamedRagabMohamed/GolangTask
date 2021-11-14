@@ -2,85 +2,117 @@ package main
 
 import (
 	"net/http"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 )
 
-//TODO change all name to Users
-func Posts(g *gin.Context) {
-	//TODO if len is retrun 200
-	if len(Users) == 0 {
-		g.JSON(http.StatusOK, "Not found users")
-	} else {
-		g.JSON(http.StatusOK, gin.H{
-			"users": Users,
+func Users(g *gin.Context) {
+	var users []User
+	db.Find(&users)
+	if len(users) == 0{
+		g.JSON(http.StatusOK,gin.H{
+		"data":"{}}",
+		"message":"No users found",
+		"error":"",
 		})
+	}else{
+		g.JSON(http.StatusOK,gin.H{
+			"data":users,
+			"message":"all found users",
+			"error":"",
+			})
 	}
 }
 
 func Store(g *gin.Context) {
-	//TODO Search in gin validation and body request not query param
 	var user User
-	err :=g.BindJSON(&user)
-	if err != nil {
-		g.JSON(http.StatusBadRequest, gin.H{
-			"message": err.Error(),
+	if err:=g.ShouldBindJSON(&user);err != nil{
+		g.JSON(http.StatusBadRequest,gin.H{
+			"error":"insert valid user data",
 		})
-	} else {
-		len := len(Users) + 1
-		Users[len] = user
-		g.JSON(http.StatusOK, gin.H{
-			"New User": user,
-		})
+		return
 	}
-
+	db.Create(&user)
+	g.JSON(http.StatusOK,gin.H{
+		"data":user,
+		"message":"User added successfully",
+		"error":"",
+	})
 }
 
 func Update(g *gin.Context) {
-	id,_:= strconv.Atoi(g.Param("id"))
-	var user User
-	g.BindJSON(&user)
-	if _,found :=Users[id];found {
-		Users[id]=User{
-			Name: user.Name,
-			Email: user.Email,
-			Password: user.Password,
-			PhoneNumber: user.PhoneNumber,
+		var oldUser User
+		id:=g.Param("id")
+		db.Find(&oldUser,id)
+		if oldUser.Name==""{
+			g.JSON(http.StatusNotFound,gin.H{
+				"data":"{}",
+				"message":"No user found",
+				"error":"",
+			})
+			return
 		}
+		var updateUser User
+		if err:=g.ShouldBindJSON(&updateUser);err != nil{
+			g.JSON(http.StatusBadRequest,gin.H{
+				"data":"{}",
+				"message":"insert valid user data",
+				"error":"",
+			})
+			return
+	    }
+
+		oldUser.Name=updateUser.Name
+		oldUser.Email=updateUser.Email
+		oldUser.Password=updateUser.Password
+		oldUser.PhoneNumber=updateUser.PhoneNumber
+
+		db.Save(&oldUser)
+
 		g.JSON(http.StatusOK,gin.H{
-			"id":Users[id],
+			"data":oldUser,
+			"message":"User updated successfully",
+			"error":"",
 		})
-	}else{
-		g.JSON(http.StatusNotFound,gin.H{
-			"message":"No found user",
-		})
-	}	
 }
 
 func Delete(g *gin.Context) {
-	id,_:= strconv.Atoi(g.Param("id"))
-	if value,found :=Users[id];found {
-		delete(Users, id)
-		g.JSON(http.StatusOK,gin.H{
-			"Deleted user":value,
-		})
-	}else{
+	var user User
+	id:=g.Param("id")
+
+	db.Find(&user,id)
+	if user.Name==""{
 		g.JSON(http.StatusNotFound,gin.H{
-			"message":"No found user",
+			"data":"",
+			"message":"No user found",
+			"error":"",
 		})
+		return
 	}
+	db.Unscoped().Delete(&user)
+	g.JSON(http.StatusOK,gin.H{
+		"data":user,
+		"message":"User deleted seccessfully",
+		"error":"",
+	})
 }
 
 func Show(g *gin.Context) {
-	id,_:= strconv.Atoi(g.Param("id"))
-	if value,found :=Users[id];found {
-		g.JSON(http.StatusOK,gin.H{
-			"id":value,
-		})
-	}else{
+	var user User
+	id:=g.Param("id")
+
+	db.Find(&user,id)
+	if user.Name==""{
 		g.JSON(http.StatusNotFound,gin.H{
-			"message":"No found user",
+			"data":"",
+			"message":"No user found",
+			"error":"",
 		})
+		return
 	}
+	g.JSON(http.StatusOK,gin.H{
+		"data":user,
+		"message":"User found seccessfully",
+		"error":"",
+	})
 }
