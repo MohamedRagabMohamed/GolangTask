@@ -56,8 +56,6 @@ func UpdateCourse(g *gin.Context) {
 	    }
 
 		oldCourse.Name=updateCourse.Name
-		oldCourse.Score=updateCourse.Score
-
 		db.Save(&oldCourse)
 
 		g.JSON(http.StatusOK,gin.H{
