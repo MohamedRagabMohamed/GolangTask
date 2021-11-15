@@ -2,7 +2,8 @@ package main
 
 import (
 	"log"
-
+	"os"
+	"github.com/subosito/gotenv"
 	"github.com/gin-gonic/gin"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -22,21 +23,19 @@ func main() {
 
 	db.AutoMigrate(&User{},&Course{},&UserCourse{})
 
-	// user APIs
 	r := gin.Default()
-	r.GET("/users", Users)
-	r.GET("/users/:id", ShowUser)
-	r.POST("/users", StoreUser)
-	r.PUT("/users/:id", UpdateUser)
-	r.DELETE("/users/:id", DeleteUser)
 
-	// course APIs
-	r.GET("/courses",Courses)
-	r.GET("/courses/:id",ShowCourse)
-	r.POST("/courses",StoreCourse)
-	r.PUT("/courses/:id",UpdateCourse)
-	r.DELETE("/courses/:id",DeleteCourse)
-
+	UserRouter(r)
 	
-	r.Run(":9090")
+	CourseRouter(r)
+
+	err := gotenv.Load()
+	if err != nil {
+		return
+	}
+
+	err = r.Run(os.Getenv("PORT"))
+	if err != nil {
+		return 
+	}
 }
